@@ -1,13 +1,50 @@
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 int extraMemoryAllocated;
 
 // implements heap sort
+// but first don't I need to make a heapif function? thats what I thought
 // extraMemoryAllocated counts bytes of memory allocated
+
+void heapify (int arr[], int a, int b)
+{
+	int max = b; 
+	int lchild= 2*b + 1;
+	int rchild = 2*b + 2;
+
+	if (lchild < a && (arr[lchild] > arr[max]))
+		max = lchild;
+
+	if (rchild < a && (arr[rchild] > arr[max]))
+		max = rchild;
+	
+	if (max != b)
+	{
+		int temp = arr[b];
+		arr[b]= arr[max];
+		arr[max] = temp;
+		heapify(arr, a, max);
+	}
+}
 void heapSort(int arr[], int n)
 {
+	// creates the heap
+	
+	for (int c = (n/2) - 1; c >= 0; c--)
+		heapify(arr,n,c);
+
+	// takes the numbers from heap in order
+	// for (int d =0; n - 1; d--)
+	// {
+	//  	int temp = arr[0];
+	//  	arr[0]= arr[d];
+	//  	arr[d] = temp;
+	//  	heapify(arr, n, d);
+	// }
+
 }
 
 
@@ -15,6 +52,65 @@ void heapSort(int arr[], int n)
 // extraMemoryAllocated counts bytes of extra memory allocated
 void mergeSort(int pData[], int l, int r)
 {
+	if (l < r)
+	{
+		int m = (l + r)/2;
+		mergeSort(pData, l, m);
+		mergeSort(pData, m+1, r);
+	
+	
+		int a, b, c;
+		int s1 = m - l + 1;
+		int s2 = r - m; 
+
+		//arrays for only temporary !Remember to free at end of fucntion
+		int* lA = (int*)malloc(s1*sizeof(int));
+		int* rA = (int*)malloc(s2*sizeof(int));
+		extraMemoryAllocated += (s1 *sizeof(lA)) + (s2* sizeof(rA));
+		
+		for(a = 0; a < s1; a++)
+		{
+			lA[a] = pData[l + a];
+		}
+		for (b = 0; b < s2; b++)
+		{
+			rA[b] = pData[m + 1 + b];
+		}
+		
+		a = 0, b = 0;
+		c = l;
+
+		do 
+		{
+			if (lA[a] <= rA[b])
+			{
+				pData[c] = lA[a];
+				a++;
+			} else 
+			{
+				pData[c] = rA[b];
+				b++;
+			}
+			c++;
+		} while(a < s1 && b < s2);
+		
+		while (a < s1)
+		{
+			pData[c] = lA[a];
+			a++;
+			c++;
+		}
+
+		while (b < s2)
+		{
+			pData[c] = rA[b];
+			b++;
+			c++;
+		}
+
+	free(lA);
+	free(rA);
+	}
 }
 
 // parses input file to an integer array
@@ -55,6 +151,11 @@ void printArray(int pData[], int dataSz)
 	printf("\tData:\n\t");
 	for (i=0;i<100;++i)
 	{
+		if (i>= dataSz)
+		{
+			printf("\n\n");
+		return;
+		}
 		printf("%d ",pData[i]);
 	}
 	printf("\n\t");
